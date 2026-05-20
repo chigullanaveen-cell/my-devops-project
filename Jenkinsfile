@@ -3,21 +3,25 @@ pipeline {
 
     stages {
 
-        stage('Build') {
+        stage('Clone') {
             steps {
-                echo 'Building application...'
+                git 'https://github.com/chigullanaveen-cell/my-devops-project.git'
             }
         }
 
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Running tests...'
+                sh 'docker build -t devops-app .'
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Container') {
             steps {
-                echo 'Deploying application...'
+                sh '''
+                docker stop devops-container || true
+                docker rm devops-container || true
+                docker run -d -p 8081:80 --name devops-container devops-app
+                '''
             }
         }
     }
